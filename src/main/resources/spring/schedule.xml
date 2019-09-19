@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!-- 分布式任务管理器 -->
+    <bean id="zkScheduleManager" class="cn.uncode.schedule.ZKScheduleManager"
+          init-method="init">
+        <property name="zkConfig">
+            <map>
+                <entry key="uncode.schedule.zkConnect" value="${zookeeper.url}"/>
+                <entry key="uncode.schedule.rootPath" value="/shiro/schedule"/>
+                <entry key="uncode.schedule.zkSessionTimeout" value="60000"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 分布式定时任务 每五秒执行一次 -->
+    <task:scheduled-tasks scheduler="zkScheduleManager">
+        <task:scheduled ref="shiroTask" method="taskExecute" cron="0/5 * * * * ?"/>
+    </task:scheduled-tasks>
+
+
+</beans>
+
+
+
+
